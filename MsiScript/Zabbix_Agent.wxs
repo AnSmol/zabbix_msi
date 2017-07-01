@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Project: Zabbix Agent windows Installer
+  author: Michel.Manceron@suiviperf.com
+  name: Zabbix_agent.wxs
+  Object: main wix installer script for zabbix agent on windows 32b and 64b
+  
+  public properties :
+  HOSTNAME (Default = WindowsName )
+  ZABBIXSERVER
+  LPORT   (Default = 10050)
+  RCMD
+  SERVERACTIVE (Default = 127.0.0.1 ) 
+         
+-->
+<?define Property_ProductVersion= $(var.VersionProduct) ?>
+<?define Property_PackageVersion= "1.0.3" ?>
+
+<?define Property_ProductCode= $(var.ProductGuid) ?> 
+  
+<?define Property_UpgradeCode= "{A8397F8F-CBD3-4017-B293-96895EC74629}" ?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
+    <Product Name="Zabbix Agent" Id="$(var.Property_ProductCode)" UpgradeCode="$(var.Property_UpgradeCode)" Language="1033" Codepage="1252" Version="$(var.Property_ProductVersion)" Manufacturer="Zabbix SIA">
+        <?if $(var.ProcessorArchitecture)=x64 ?>
+        <Package Id="*" Keywords="Installer" Description="Zabbix Agent installer" Comments="Zabbix Agent Installer" Manufacturer="Michel Manceron" InstallerVersion="200" Languages="1033" Compressed="yes" SummaryCodepage="1252" Platform="x64" />
+        <?else ?>
+        <Package Id="*" Keywords="Installer" Description="Zabbix Agent installer" Comments="Zabbix Agent Installer" Manufacturer="Michel Manceron" InstallerVersion="100" Languages="1033" Compressed="yes" SummaryCodepage="1252" />
+        <?endif ?>
+        <Upgrade Id="$(var.Property_UpgradeCode)">
+            <UpgradeVersion OnlyDetect="no" Property="OLDFOUND" Minimum="1.8.8" IncludeMinimum="yes" Maximum="$(var.Property_ProductVersion)" IncludeMaximum="no" />
+            <UpgradeVersion OnlyDetect="yes" Property="SELFFOUND" Minimum="$(var.Property_ProductVersion)" IncludeMinimum="yes" Maximum="$(var.Property_ProductVersion)" IncludeMaximum="yes" />
+            <UpgradeVersion OnlyDetect="yes" Property="NEWERFOUND" Minimum="$(var.Property_ProductVersion)" IncludeMinimum="no" />
+        </Upgrade>
+        <Media Id="1" Cabinet="zabbixAgent.cab" EmbedCab="yes" DiskPrompt="Disk #1" />
+        <Property Id="DiskPrompt" Value="Zabbix Agent installer [1]" />
+        <Property Id="INSTALLLEVEL" Value="200" />
+        <Property Id="INSTALLDIR">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <RegistrySearch Id="ZabbixAgentRegistry" Type="directory" Root="HKLM" Key="Software\Zabbix Agent" Name="InstallDir" Win64="yes" />
+            <?else ?>
+            <RegistrySearch Id="ZabbixAgentRegistry" Type="directory" Root="HKLM" Key="Software\Zabbix Agent" Name="InstallDir" Win64="no" />
+            <?endif ?>
+        </Property>
+        <Property Id="HOSTNAME">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <RegistrySearch Id="HOSTNAMEReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="Hostname" Win64="yes" />
+            <?else ?>
+            <RegistrySearch Id="HOSTNAMEReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="Hostname" Win64="no" />
+            <?endif ?>
+        </Property>
+		<Property Id="HOSTNAMEFQDN" Secure="yes"></Property>
+        <Property Id="SERVER">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <RegistrySearch Id="ZABBIXSERVERReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="ZabbixServer" Win64="yes" />
+            <?else ?>
+            <RegistrySearch Id="ZABBIXSERVERReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="ZabbixServer" Win64="no" />
+            <?endif ?>
+        </Property>
+        <Property Id="LPORT" Value="10050">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <RegistrySearch Id="LISTENPORTReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="ListenPort" Win64="yes" />
+            <?else ?>
+            <RegistrySearch Id="LISTENPORTReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="ListenPort" Win64="no" />
+            <?endif ?>
+        </Property>
+        <Property Id="RMTCMD" Value="1">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <RegistrySearch Id="RCMDReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="RemoteCommand" Win64="yes" />
+            <?else ?>
+            <RegistrySearch Id="RCMDReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="RemoteCommand" Win64="no" />
+            <?endif ?>
+        </Property>
+        <Property Id="SERVERACTIVE" Value="127.0.0.1">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <RegistrySearch Id="SERVERACTIVEReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="ServerActive" Win64="yes" />
+            <?else ?>
+            <RegistrySearch Id="SERVERACTIVEReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="ServerActive" Win64="no" />
+            <?endif ?>
+        </Property>
+		
+        <Property Id="OLDZABBIX">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <RegistrySearch Id="OldZabbixReg" Type="raw" Root="HKLM" Key="SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Zabbix Agent" Name="UninstallString" />
+            <?else ?>
+            <RegistrySearch Id="OldZabbixReg" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Zabbix Agent" Name="UninstallString" />
+            <?endif ?>
+        </Property>
+        <Property Id="OLDZABBIXPATH">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <RegistrySearch Id="OldZabbixAgentReg" Type="directory" Root="HKLM" Key="SOFTWARE\Wow6432Node\Zabbix Agent" Name="Install_Dir" Win64="yes" />
+            <?else ?>
+            <RegistrySearch Id="OldZabbixAgentReg" Type="directory" Root="HKLM" Key="Software\Zabbix Agent" Name="Install_Dir" Win64="no" />
+            <?endif ?>
+        </Property >
+		
+		
+		<SetProperty Before='AppSearch' Sequence='both' Id='HOSTNAMEFQDN' Value='{}'><![CDATA[HOSTNAMEFQDN="0"]]></SetProperty>
+        <SetProperty Before='AppSearch' Sequence='both' Id='RMTCMD' Value='{}'><![CDATA[RMTCMD="0"]]></SetProperty>
+        <SetProperty Before='AppSearch' Sequence='both' Id='HOSTNAME' Value='[ComputerName]'>NOT HOSTNAME</SetProperty>
+       
+        <?if $(var.ProcessorArchitecture)=x86 ?>
+        <Condition Message="You are attempting to run the 32-bit installer on a 64-bit version of Windows."><![CDATA[ NOT Msix64]]></Condition>
+        <?endif ?>
+        <Property Id="ALLUSERS"><![CDATA[1]]></Property>
+        <Property Id="ROOTDIR"><![CDATA[C:\]]></Property>
+		<Property Id="CONFIG"><![CDATA[OVERWRITE]]></Property>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <Directory Id="ProgramFiles64Folder" Name="PFiles">
+                <Directory Id="INSTALLDIR" Name="Zabbix Agent"> 
+                    <Directory Id="dev" Name="dev"/>
+                </Directory>               
+            </Directory>
+            <?else ?>
+            <Directory Id="ProgramFilesFolder" Name="PFiles">
+                <Directory Id="INSTALLDIR" Name="Zabbix Agent">
+                    <Directory Id="dev" Name="dev"/>
+                </Directory>
+            </Directory>
+            <?endif ?>
+            <Directory Id="OLDZABBIXPATH" />
+        </Directory>
+        <DirectoryRef Id="INSTALLDIR">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <Component Id="zabbixExecutable$(var.ProcessorArchitecture)" Guid="{2ECF4F9A-E01F-496D-B61B-4C6511059151}" Win64="yes">
+                <File Id="zabbix_agentdEXE" Name="zabbix_agentd.exe" DiskId="1" Source="files\win64\zabbix_agentd.exe" KeyPath="yes" />
+                <RegistryKey Root="HKLM" Key="Software\zabbix Agent" >
+                    <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
+                    <RegistryValue Type="string" Name="HostName" Value="[HOSTNAME]" />
+					<RegistryValue Type="string" Name="HostNameFQDN" Value="[HOSTNAMEFQDN]" />
+                    <RegistryValue Type="string" Name="ZabbixServer" Value="[SERVER]" />
+                    <RegistryValue Type="string" Name="ListenPort" Value="[LPORT]" />
+                    <RegistryValue Type="string" Name="RemoteCommand" Value="[RMTCMD]" />
+                    <RegistryValue Type="string" Name="ServerAvctive" Value="[SERVERACTIVE]" />
+                </RegistryKey>
+            </Component>
+			<Component Id="zabbix_config$(var.ProcessorArchitecture)" Guid="{C8D1E8AB-0CCD-4860-8452-88DF4076C522}" Win64="yes">
+                <File Id="zabbix_agentdconf" Name="zabbix_agentd.conf" DiskId="1" Source="files\zabbix_agentd.conf" KeyPath="no" />
+            </Component>
+            <Component Id="zabbix_getExecutable$(var.ProcessorArchitecture)" Guid="{5C9D163B-505E-45E2-9B23-58CECC9B6190}" Win64="yes">
+                <File Id="zabbix_getEXE" Name="zabbix_get.exe" DiskId="1" Source="files\win64\zabbix_get.exe" KeyPath="yes" />
+            </Component>
+            <Component Id="zabbix_senderExecutable$(var.ProcessorArchitecture)" Guid="{761D79FF-CDBC-4D28-8427-D5C219A97AF3}" Win64="yes">
+                <File Id="zabbix_senderEXE" Name="zabbix_sender.exe" DiskId="1" Source="files\win64\zabbix_sender.exe" KeyPath="yes" />
+            </Component>
+			<?else ?>
+            <Component Id="zabbixExecutable$(var.ProcessorArchitecture)" Guid="{2ECF4F9A-E01F-496D-B61B-4C6511059151}">
+                <File Id="zabbix_agentdEXE" Name="zabbix_agentd.exe" DiskId="1" Source="files\win32\zabbix_agentd.exe" KeyPath="yes" />
+                <RegistryKey Root="HKLM" Key="Software\zabbix Agent" >
+                    <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
+                    <RegistryValue Type="string" Name="HostName" Value="[HOSTNAME]" />
+					<RegistryValue Type="string" Name="HostNameFQDN" Value="[HOSTNAMEFQDN]" />
+                    <RegistryValue Type="string" Name="ZabbixServer" Value="[SERVER]" />
+                    <RegistryValue Type="string" Name="ListenPort" Value="[LPORT]" />
+                    <RegistryValue Type="string" Name="RemoteCommand" Value="[RMTCMD]" />
+                    <RegistryValue Type="string" Name="ServerAvctive" Value="[SERVERACTIVE]" />
+                </RegistryKey>
+            </Component>
+			<Component Id="zabbix_config$(var.ProcessorArchitecture)" Guid="{C8D1E8AB-0CCD-4860-8452-88DF4076C522}">
+                <File Id="zabbix_agentdconf" Name="zabbix_agentd.conf" DiskId="1" Source="files\zabbix_agentd.conf" KeyPath="no" />
+            </Component>
+            <Component Id="zabbix_getExecutable$(var.ProcessorArchitecture)" Guid="{5C9D163B-505E-45E2-9B23-58CECC9B6190}">
+                <File Id="zabbix_getEXE" Name="zabbix_get.exe" DiskId="1" Source="files\win32\zabbix_get.exe" KeyPath="yes" />
+            </Component>
+            <Component Id="zabbix_senderExecutable$(var.ProcessorArchitecture)" Guid="{761D79FF-CDBC-4D28-8427-D5C219A97AF3}">
+                <File Id="zabbix_senderEXE" Name="zabbix_sender.exe" DiskId="1" Source="files\win32\zabbix_sender.exe" KeyPath="yes" />
+            </Component>
+            <?endif ?>
+        </DirectoryRef>
+        <DirectoryRef Id="dev">
+             <?if $(var.ProcessorArchitecture)=x64 ?>
+                <Component Id="zabbix_senderdev$(var.ProcessorArchitecture)" Guid="{476D20B5-CBA4-45D5-A461-1D838572A5BD}" Win64="yes">
+                  <File Id="zabbix_senderdll" Name="zabbix_sender.dll" DiskId="1" Source="files\win64\dev\zabbix_sender.dll" KeyPath="yes" />
+                  <File Id="zabbix_senderlib" Name="zabbix_sender.lib" DiskId="1" Source="files\win64\dev\zabbix_sender.lib" KeyPath="no" />
+                  <File Id="zabbix_senderh" Name="zabbix_sender.h" DiskId="1" Source="files\win64\dev\zabbix_sender.h" KeyPath="no" />
+                </Component>
+            <?else ?>
+               <Component Id="zabbix_senderdev$(var.ProcessorArchitecture)" Guid="{476D20B5-CBA4-45D5-A461-1D838572A5BD}">
+                  <File Id="zabbix_senderdll" Name="zabbix_sender.dll" DiskId="1" Source="files\win64\dev\zabbix_sender.dll" KeyPath="yes" />
+                  <File Id="zabbix_senderlib" Name="zabbix_sender.lib" DiskId="1" Source="files\win64\dev\zabbix_sender.lib" KeyPath="no" />
+                  <File Id="zabbix_senderh" Name="zabbix_sender.h" DiskId="1" Source="files\win64\dev\zabbix_sender.h" KeyPath="no" />
+              </Component>
+            <?endif ?>
+        </DirectoryRef>
+        <Feature Id="Complete" Title="Zabbix Agent" Description="Zabbix agent daemon runs on a host being monitored. The agent provides hosts performance and availability information for Zabbix Server." Display="expand" Level="1" ConfigurableDirectory="INSTALLDIR">
+            <Feature Id="MainProgram" Title="Program" Description="The main executable." Level="1" Absent="disallow">
+                <ComponentRef Id="zabbixExecutable$(var.ProcessorArchitecture)" />
+	         	<ComponentRef Id="zabbix_config$(var.ProcessorArchitecture)" />
+            </Feature>
+            <Feature Id="zabbix_senderProgram$(var.ProcessorArchitecture)" Title="Zabbix sender" Description="Zabbix Sender is a command line utility which may be used to send performance data to Zabbix server for processing." Level="2">
+                <ComponentRef Id="zabbix_senderExecutable$(var.ProcessorArchitecture)" />
+                <ComponentRef Id="zabbix_senderdev$(var.ProcessorArchitecture)" />
+            </Feature>
+            <Feature Id="zabbix_getProgram$(var.ProcessorArchitecture)" Title="Zabbix Get" Description="Zabbix get is a process which communicates with Zabbix agent and retrieves required information." Level="200">
+                <ComponentRef Id="zabbix_getExecutable$(var.ProcessorArchitecture)" />
+            </Feature>
+        </Feature>
+        <UI Id="MyWixUI_FeatureTree">
+            <UIRef Id="WixUI_FeatureTree" />
+            <UIRef Id="WixUI_ErrorProgressText" />
+            <DialogRef Id="ZabbixParameterDlg" />
+            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="ZabbixParameterDlg" Order="3">LicenseAccepted = "1"</Publish>
+            <Publish Dialog="CustomizeDlg" Control="Back" Event="NewDialog" Value="ZabbixParameterDlg" Order="3">1</Publish>
+        </UI>
+        <WixVariable Id="WixUILicenseRtf" Value="msiscript\include\License.rtf" />
+        <WixVariable Id="WixUIBannerBmp" Value="msiscript\img\banner.bmp" />
+        <!--
+        <WixVariable Id="WixUIDialogBmp" Value="msiscript\img\dialog.bmp" />
+   -->
+		<Binary Id="Script_vbs" SourceFile="msiscript\include\Script.vbs" />
+		
+        <SystemTools:TemplateFile Id="zabbix_agentdconf_comp" Source="[#zabbix_agentdconf]" Target="[INSTALLDIR]zabbix_agentd.conf" ExecuteOnInstall="yes" ExecuteOnReInstall="yes">
+			<SystemTools:TemplateFileProperty Id="LOGFILEE_property" Name="LOGFILE" Value="[LOGFILE]" />
+            <SystemTools:TemplateFileProperty Id="HOSTNAME_property" Name="HOSTNAME" Value="[HOSTNAME]" />
+            <SystemTools:TemplateFileProperty Id="SERVER_property" Name="SERVER" Value="[SERVER]" />
+            <SystemTools:TemplateFileProperty Id="LPORT_property" Name="LPORT" Value="[LPORT]" />
+            <SystemTools:TemplateFileProperty Id="RMTCMD_property" Name="RMTCMD" Value="[RMTCMD]" />
+			<SystemTools:TemplateFileProperty Id="SERVERACTIVE_property" Name="SERVERACTIVE" Value="[SERVERACTIVE]" />
+        </SystemTools:TemplateFile>
+		<?if $(var.ProcessorArchitecture)=x64 ?>
+          <CustomAction Id="SChangeConfig" VBScriptCall="ChangeConfig" BinaryKey="Script_vbs" Win64="yes" />
+        <?else ?>
+          <CustomAction Id="SChangeConfig" VBScriptCall="ChangeConfig" BinaryKey="Script_vbs" Win64="no" />
+        <?endif ?>
+        <?if $(var.ProcessorArchitecture)=x64 ?>
+          <CustomAction Id="Shostnamefqdn" VBScriptCall="hostnamefqdn" BinaryKey="Script_vbs" Win64="yes" />
+        <?else ?>
+          <CustomAction Id="Shostnamefqdn" VBScriptCall="hostnamefqdn" BinaryKey="Script_vbs" Win64="no" />
+        <?endif ?>
+        
+        <CustomAction Id="RegisterAgentExe" Execute="deferred" Impersonate="no" FileKey="zabbix_agentdEXE" ExeCommand="--config &quot;[INSTALLDIR]zabbix_agentd.conf&quot; --install" />
+        <CustomAction Id="RunAgentExe" Execute="deferred" Impersonate="no" FileKey="zabbix_agentdEXE" ExeCommand="--config &quot;[INSTALLDIR]zabbix_agentd.conf&quot; --start" />
+        <CustomAction Id="stopAgentExe" Execute="deferred" Impersonate="no" Return="ignore" FileKey="zabbix_agentdEXE" ExeCommand="--config &quot;[INSTALLDIR]zabbix_agentd.conf&quot; --stop" />
+        <CustomAction Id="UninstAgentExe" Execute="deferred" Impersonate="no" Return="ignore" FileKey="zabbix_agentdEXE" ExeCommand="--config &quot;[INSTALLDIR]zabbix_agentd.conf&quot; --uninstall" />
+        <CustomAction Id="KillAgent" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLDIR" ExeCommand="Taskkill /F /IM zabbix_agentd.exe" />
+        <CustomAction Id="DeleteAgentService" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLDIR" ExeCommand="SC Delete &quot;zabbix agent&quot;" />
+        <!-- <CustomAction Id="DeletConfig" Return="ignore" Directory="INSTALLDIR" ExeCommand="Delete [INSTALLDIR]zabbixagentd.conf&quot;" /> -->
+        <CustomAction Id="UnoldZabbix" Execute="deferred" Impersonate="no" Directory="OLDZABBIXPATH" ExeCommand="[OLDZABBIX] /S" />
+        <CustomAction Id="AlreadyUpdated" Error="[ProductName] has already been updated to 1.0.1 or newer." />
+        <CustomAction Id="NoDowngrade" Error="A later version of [ProductName] is already installed." />
+        <InstallExecuteSequence>
+            <RemoveExistingProducts After="InstallFinalize" />
+            <Custom Action="AlreadyUpdated" After="FindRelatedProducts">SELFFOUND</Custom>
+            <Custom Action="NoDowngrade" After="FindRelatedProducts">NEWERFOUND</Custom>
+            <Custom Action="SChangeConfig" Before="CostInitialize">NOT (REMOVE="ALL")</Custom>
+			<Custom Action="Shostnamefqdn" After="SChangeConfig"><![CDATA[HOSTNAMEFQDN="1"]]></Custom>
+            <Custom Action="RegisterAgentExe" Before="InstallFinalize">NOT (REMOVE="ALL")</Custom>
+            <Custom Action="RunAgentExe" After="RegisterAgentExe">NOT (REMOVE="ALL")</Custom>
+            <Custom Action="stopAgentExe" After="InstallInitialize">Installed</Custom>
+            <Custom Action="UninstAgentExe" After="stopAgentExe">Installed OR <![CDATA[OLDFOUND<>""]]></Custom>
+            <Custom Action="UnoldZabbix" After="InstallInitialize"><![CDATA[OLDZABBIX<>""]]> AND NOT Installed</Custom>
+            <!-- <Custom Action="SSleeping" After="UnoldZabbix"><![CDATA[OLDZABBIX<>""]]> AND NOT Installed</Custom> -->
+            <Custom Action="KillAgent" After="UnoldZabbix"><![CDATA[REINSTALL<>""]]> OR <![CDATA[OLDFOUND<>""]]></Custom>
+            <Custom Action="DeleteAgentService" After="KillAgent"><![CDATA[REINSTALL<>""]]></Custom>
+        </InstallExecuteSequence>
+    </Product>
+</Wix>
