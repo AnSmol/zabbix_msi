@@ -19,7 +19,7 @@
 <?define Property_ProductCode= $(var.ProductGuid) ?> 
   
 <?define Property_UpgradeCode= "{A8397F8F-CBD3-4017-B293-96895EC74629}" ?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension"  xmlns:Fire="http://schemas.microsoft.com/wix/FirewallExtension">
     <Product Name="Zabbix Agent" Id="$(var.Property_ProductCode)" UpgradeCode="$(var.Property_UpgradeCode)" Language="1033" Codepage="1252" Version="$(var.Property_ProductVersion)" Manufacturer="Zabbix SIA">
         <?if $(var.ProcessorArchitecture)=x64 ?>
         <Package Id="*" Keywords="Installer" Description="Zabbix Agent installer" Comments="Zabbix Agent Installer" Manufacturer="Michel Manceron" InstallerVersion="200" Languages="1033" Compressed="yes" SummaryCodepage="1252" Platform="x64" />
@@ -123,6 +123,7 @@
         <DirectoryRef Id="INSTALLDIR">
             <?if $(var.ProcessorArchitecture)=x64 ?>
             <Component Id="zabbixExecutable$(var.ProcessorArchitecture)" Guid="{2ECF4F9A-E01F-496D-B61B-4C6511059151}" Win64="yes">
+			<Fire:FirewallException Id="Zabbix_Agent" Name="Zabbix Agent" Protocol="tcp" Port="[LPORT]" Scope="any" IgnoreFailure="yes" Profile="all" />
                 <File Id="zabbix_agentdEXE" Name="zabbix_agentd.exe" DiskId="1" Source="files\win64\zabbix_agentd.exe" KeyPath="yes" />
                 <RegistryKey Root="HKLM" Key="Software\zabbix Agent" >
                     <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
@@ -145,6 +146,7 @@
             </Component>
 			<?else ?>
             <Component Id="zabbixExecutable$(var.ProcessorArchitecture)" Guid="{2ECF4F9A-E01F-496D-B61B-4C6511059151}">
+			<Fire:FirewallException Id="Zabbix_Agent" Name="Zabbix Agent" Protocol="tcp" Port="[LPORT]" Scope="any" IgnoreFailure="yes" Profile="all" />
                 <File Id="zabbix_agentdEXE" Name="zabbix_agentd.exe" DiskId="1" Source="files\win32\zabbix_agentd.exe" KeyPath="yes" />
                 <RegistryKey Root="HKLM" Key="Software\zabbix Agent" >
                     <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
