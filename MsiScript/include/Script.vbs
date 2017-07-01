@@ -12,6 +12,7 @@ sub ChangeConfig
   HOSTNAME     = Session.Property("HOSTNAME")
   InstallDir   = Session.Property("INSTALLDIR")
   HOSTNAMEFQDN = Session.Property("HOSTNAMEFQDN")
+  HOSTMETADATA = Session.Property("HOSTMETADATA")
   
   if RCMD <> "1" then RCMD ="0"
   if HOSTNAMEFQDN <> "1" then HOSTNAMEFQDN="0"
@@ -22,6 +23,7 @@ sub ChangeConfig
   Session.Property("LOGFILE")       = LOGFILE
   Session.Property("HOSTNAME")      = HOSTNAME 
   Session.Property("HOSTNAMEFQDN")  = HOSTNAMEFQDN
+  
   
 
 end sub
