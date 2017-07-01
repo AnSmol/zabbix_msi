@@ -78,6 +78,14 @@
             <?endif ?>
         </Property>
 		
+        <Property Id="HOSTMETADATA" Value="127.0.0.1">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <RegistrySearch Id="HOSTMETADATAReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="HostMetaData" Win64="yes" />
+            <?else ?>
+            <RegistrySearch Id="HOSTMETADATAReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="HostMetaData" Win64="no" />
+            <?endif ?>
+        </Property>
+		
         <Property Id="OLDZABBIX">
             <?if $(var.ProcessorArchitecture)=x64 ?>
             <RegistrySearch Id="OldZabbixReg" Type="raw" Root="HKLM" Key="SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Zabbix Agent" Name="UninstallString" />
@@ -133,6 +141,7 @@
                     <RegistryValue Type="string" Name="ListenPort" Value="[LPORT]" />
                     <RegistryValue Type="string" Name="RemoteCommand" Value="[RMTCMD]" />
                     <RegistryValue Type="string" Name="ServerAvctive" Value="[SERVERACTIVE]" />
+                    <RegistryValue Type="string" Name="HostMetaData" Value="[HOSTMETADATA]" />
                 </RegistryKey>
             </Component>
 			<Component Id="zabbix_config$(var.ProcessorArchitecture)" Guid="{C8D1E8AB-0CCD-4860-8452-88DF4076C522}" Win64="yes">
@@ -156,6 +165,7 @@
                     <RegistryValue Type="string" Name="ListenPort" Value="[LPORT]" />
                     <RegistryValue Type="string" Name="RemoteCommand" Value="[RMTCMD]" />
                     <RegistryValue Type="string" Name="ServerAvctive" Value="[SERVERACTIVE]" />
+                    <RegistryValue Type="string" Name="HostMetaData" Value="[HOSTMETADATA]" />
                 </RegistryKey>
             </Component>
 			<Component Id="zabbix_config$(var.ProcessorArchitecture)" Guid="{C8D1E8AB-0CCD-4860-8452-88DF4076C522}">
@@ -218,6 +228,7 @@
             <SystemTools:TemplateFileProperty Id="LPORT_property" Name="LPORT" Value="[LPORT]" />
             <SystemTools:TemplateFileProperty Id="RMTCMD_property" Name="RMTCMD" Value="[RMTCMD]" />
 			<SystemTools:TemplateFileProperty Id="SERVERACTIVE_property" Name="SERVERACTIVE" Value="[SERVERACTIVE]" />
+			<SystemTools:TemplateFileProperty Id="HOSTMETADATA_property" Name="HOSTMETADATA" Value="[HOSTMETADATA]" />
         </SystemTools:TemplateFile>
 		<?if $(var.ProcessorArchitecture)=x64 ?>
           <CustomAction Id="SChangeConfig" VBScriptCall="ChangeConfig" BinaryKey="Script_vbs" Win64="yes" />
