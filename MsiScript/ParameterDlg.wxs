@@ -13,8 +13,8 @@
                 <Control Id="ServerEdit"        Type="Edit" X="128" Y="115" Width="220" Height="15" Property="SERVER" Text="{80}" />
                 <Control Id="AgentPortLabel"    Type="Text" Width="50" Height="10" X="35" Y="137" Text="&amp;Agent Port:" />
                 <Control Id="AgentPortEdit"     Type="Edit" Width="35" Height="15" X="128" Y="136" Property="LPORT" Text="{5}" />
-				<Control Id="HostMetaDataLabel"    Type="Text" X="35" Y="156" Width="82" Height="15" TabSkip="yes" Text="Region code:" />
-				<Control Id="HostMetaDataEdit"     Type="Edit" X="128" Y="156" Width="220" Height="15" Property="HOSTMETADATA" />
+				<Control Id="RegionCodeLabel"    Type="Text" X="35" Y="156" Width="82" Height="15" TabSkip="yes" Text="Region code:" />
+				<Control Id="RegionCodeEdit"     Type="Edit" X="128" Y="156" Width="220" Height="15" Property="REGIONCODE" />
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
                     <Publish Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
                 </Control>

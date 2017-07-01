@@ -9,7 +9,7 @@
 
   ZABBIXSERVER
   LPORT   (Default = 10050)
-         
+  REGIONCODE       
 -->
 <?define Property_ProductVersion= $(var.VersionProduct) ?>
 <?define Property_PackageVersion= "1.0.3" ?>
@@ -62,11 +62,11 @@
             <?endif ?>
         </Property>
 		
-        <Property Id="HOSTMETADATA" Value="127.0.0.1">
+        <Property Id="REGIONCODE">
             <?if $(var.ProcessorArchitecture)=x64 ?>
-            <RegistrySearch Id="HOSTMETADATAReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="HostMetaData" Win64="yes" />
+            <RegistrySearch Id="REGIONCODEReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="RegionCode" Win64="yes" />
             <?else ?>
-            <RegistrySearch Id="HOSTMETADATAReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="HostMetaData" Win64="no" />
+            <RegistrySearch Id="REGIONCODEReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="RegionCode" Win64="no" />
             <?endif ?>
         </Property>
 		
@@ -119,7 +119,7 @@
                     <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
                     <RegistryValue Type="string" Name="ZabbixServer" Value="[SERVER]" />
                     <RegistryValue Type="string" Name="ListenPort" Value="[LPORT]" />
-                    <RegistryValue Type="string" Name="HostMetaData" Value="[HOSTMETADATA]" />
+                    <RegistryValue Type="string" Name="RegionCode" Value="[REGIONCODE]" />
                 </RegistryKey>
             </Component>
 			<Component Id="zabbix_config$(var.ProcessorArchitecture)" Guid="{C8D1E8AB-0CCD-4860-8452-88DF4076C522}" Win64="yes">
@@ -139,7 +139,7 @@
                     <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
                     <RegistryValue Type="string" Name="ZabbixServer" Value="[SERVER]" />
                     <RegistryValue Type="string" Name="ListenPort" Value="[LPORT]" />
-                    <RegistryValue Type="string" Name="HostMetaData" Value="[HOSTMETADATA]" />
+                    <RegistryValue Type="string" Name="RegionCode" Value="[REGIONCODE]" />
                 </RegistryKey>
             </Component>
 			<Component Id="zabbix_config$(var.ProcessorArchitecture)" Guid="{C8D1E8AB-0CCD-4860-8452-88DF4076C522}">
@@ -199,7 +199,7 @@
 			<SystemTools:TemplateFileProperty Id="LOGFILEE_property" Name="LOGFILE" Value="[LOGFILE]" />
             <SystemTools:TemplateFileProperty Id="SERVER_property" Name="SERVER" Value="[SERVER]" />
             <SystemTools:TemplateFileProperty Id="LPORT_property" Name="LPORT" Value="[LPORT]" />
-			<SystemTools:TemplateFileProperty Id="HOSTMETADATA_property" Name="HOSTMETADATA" Value="[HOSTMETADATA]" />
+			<SystemTools:TemplateFileProperty Id="REGIONCODE_property" Name="REGIONCODE" Value="[REGIONCODE]" />
         </SystemTools:TemplateFile>
 		<?if $(var.ProcessorArchitecture)=x64 ?>
           <CustomAction Id="SChangeConfig" VBScriptCall="ChangeConfig" BinaryKey="Script_vbs" Win64="yes" />
