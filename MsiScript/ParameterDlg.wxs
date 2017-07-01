@@ -23,6 +23,8 @@
                 <Control Id="Rcmdcheck"         Type="CheckBox" Width="10" Height="12" X="128" Y="156" Property="RMTCMD" CheckBoxValue="1"/>
                 <Control Id="ServerActLabel"    Type="Text" X="35" Y="177" Width="82" Height="15" TabSkip="yes" Text="Active server:" />
                 <Control Id="ServerActEdit"     Type="Edit" X="128" Y="176" Width="220" Height="15" Property="SERVERACTIVE" Text="{127}" />
+				<Control Id="HostMetaDataLabel"    Type="Text" X="35" Y="207" Width="82" Height="15" TabSkip="yes" Text="Hostmetadata:" />
+				<Control Id="HostMetaDataEdit"     Type="Edit" X="128" Y="208" Width="220" Height="15" Property="HOSTMETADATA" />
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
                     <Publish Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
                 </Control>
