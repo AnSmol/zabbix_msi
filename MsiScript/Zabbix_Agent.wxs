@@ -6,9 +6,9 @@
   Object: main wix installer script for zabbix agent on windows 32b and 64b
   
   public properties :
+
   ZABBIXSERVER
   LPORT   (Default = 10050)
-  HOSTMETADATA
          
 -->
 <?define Property_ProductVersion= $(var.VersionProduct) ?>
@@ -39,8 +39,15 @@
             <RegistrySearch Id="ZabbixAgentRegistry" Type="directory" Root="HKLM" Key="Software\Zabbix Agent" Name="InstallDir" Win64="no" />
             <?endif ?>
         </Property>
-        
-		<Property Id="SERVER">
+        <Property Id="HOSTNAME">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <RegistrySearch Id="HOSTNAMEReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="Hostname" Win64="yes" />
+            <?else ?>
+            <RegistrySearch Id="HOSTNAMEReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="Hostname" Win64="no" />
+            <?endif ?>
+        </Property>
+		<Property Id="HOSTNAMEFQDN" Secure="yes"></Property>
+        <Property Id="SERVER">
             <?if $(var.ProcessorArchitecture)=x64 ?>
             <RegistrySearch Id="ZABBIXSERVERReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="ZabbixServer" Win64="yes" />
             <?else ?>
@@ -54,8 +61,8 @@
             <RegistrySearch Id="LISTENPORTReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="ListenPort" Win64="no" />
             <?endif ?>
         </Property>
-        
-        <Property Id="HOSTMETADATA">
+		
+        <Property Id="HOSTMETADATA" Value="127.0.0.1">
             <?if $(var.ProcessorArchitecture)=x64 ?>
             <RegistrySearch Id="HOSTMETADATAReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="HostMetaData" Win64="yes" />
             <?else ?>
@@ -63,8 +70,23 @@
             <?endif ?>
         </Property>
 		
+        <Property Id="OLDZABBIX">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <RegistrySearch Id="OldZabbixReg" Type="raw" Root="HKLM" Key="SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Zabbix Agent" Name="UninstallString" />
+            <?else ?>
+            <RegistrySearch Id="OldZabbixReg" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Zabbix Agent" Name="UninstallString" />
+            <?endif ?>
+        </Property>
+        <Property Id="OLDZABBIXPATH">
+            <?if $(var.ProcessorArchitecture)=x64 ?>
+            <RegistrySearch Id="OldZabbixAgentReg" Type="directory" Root="HKLM" Key="SOFTWARE\Wow6432Node\Zabbix Agent" Name="Install_Dir" Win64="yes" />
+            <?else ?>
+            <RegistrySearch Id="OldZabbixAgentReg" Type="directory" Root="HKLM" Key="Software\Zabbix Agent" Name="Install_Dir" Win64="no" />
+            <?endif ?>
+        </Property >
 		
-	
+		
+		<SetProperty Before='AppSearch' Sequence='both' Id='HOSTNAMEFQDN' Value='{}'><![CDATA[HOSTNAMEFQDN="0"]]></SetProperty>
        
         <?if $(var.ProcessorArchitecture)=x86 ?>
         <Condition Message="You are attempting to run the 32-bit installer on a 64-bit version of Windows."><![CDATA[ NOT Msix64]]></Condition>
@@ -86,7 +108,7 @@
                 </Directory>
             </Directory>
             <?endif ?>
-            
+            <Directory Id="OLDZABBIXPATH" />
         </Directory>
         <DirectoryRef Id="INSTALLDIR">
             <?if $(var.ProcessorArchitecture)=x64 ?>
@@ -95,7 +117,7 @@
                 <File Id="zabbix_agentdEXE" Name="zabbix_agentd.exe" DiskId="1" Source="files\win64\zabbix_agentd.exe" KeyPath="yes" />
                 <RegistryKey Root="HKLM" Key="Software\zabbix Agent" >
                     <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
-        			<RegistryValue Type="string" Name="ZabbixServer" Value="[SERVER]" />
+                    <RegistryValue Type="string" Name="ZabbixServer" Value="[SERVER]" />
                     <RegistryValue Type="string" Name="ListenPort" Value="[LPORT]" />
                     <RegistryValue Type="string" Name="HostMetaData" Value="[HOSTMETADATA]" />
                 </RegistryKey>
@@ -114,8 +136,8 @@
 			<Fire:FirewallException Id="Zabbix_Agent" Name="Zabbix Agent" Protocol="tcp" Port="[LPORT]" Scope="any" IgnoreFailure="yes" Profile="all" />
                 <File Id="zabbix_agentdEXE" Name="zabbix_agentd.exe" DiskId="1" Source="files\win32\zabbix_agentd.exe" KeyPath="yes" />
                 <RegistryKey Root="HKLM" Key="Software\zabbix Agent" >
-                     <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
-        			<RegistryValue Type="string" Name="ZabbixServer" Value="[SERVER]" />
+                    <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
+                    <RegistryValue Type="string" Name="ZabbixServer" Value="[SERVER]" />
                     <RegistryValue Type="string" Name="ListenPort" Value="[LPORT]" />
                     <RegistryValue Type="string" Name="HostMetaData" Value="[HOSTMETADATA]" />
                 </RegistryKey>
@@ -175,8 +197,9 @@
 		
         <SystemTools:TemplateFile Id="zabbix_agentdconf_comp" Source="[#zabbix_agentdconf]" Target="[INSTALLDIR]zabbix_agentd.conf" ExecuteOnInstall="yes" ExecuteOnReInstall="yes">
 			<SystemTools:TemplateFileProperty Id="LOGFILEE_property" Name="LOGFILE" Value="[LOGFILE]" />
+            <SystemTools:TemplateFileProperty Id="SERVER_property" Name="SERVER" Value="[SERVER]" />
             <SystemTools:TemplateFileProperty Id="LPORT_property" Name="LPORT" Value="[LPORT]" />
-        	<SystemTools:TemplateFileProperty Id="HOSTMETADATA_property" Name="HOSTMETADATA" Value="[HOSTMETADATA]" />
+			<SystemTools:TemplateFileProperty Id="HOSTMETADATA_property" Name="HOSTMETADATA" Value="[HOSTMETADATA]" />
         </SystemTools:TemplateFile>
 		<?if $(var.ProcessorArchitecture)=x64 ?>
           <CustomAction Id="SChangeConfig" VBScriptCall="ChangeConfig" BinaryKey="Script_vbs" Win64="yes" />
@@ -196,7 +219,7 @@
         <CustomAction Id="KillAgent" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLDIR" ExeCommand="Taskkill /F /IM zabbix_agentd.exe" />
         <CustomAction Id="DeleteAgentService" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLDIR" ExeCommand="SC Delete &quot;zabbix agent&quot;" />
         <!-- <CustomAction Id="DeletConfig" Return="ignore" Directory="INSTALLDIR" ExeCommand="Delete [INSTALLDIR]zabbixagentd.conf&quot;" /> -->
-   
+        <CustomAction Id="UnoldZabbix" Execute="deferred" Impersonate="no" Directory="OLDZABBIXPATH" ExeCommand="[OLDZABBIX] /S" />
         <CustomAction Id="AlreadyUpdated" Error="[ProductName] has already been updated to 1.0.1 or newer." />
         <CustomAction Id="NoDowngrade" Error="A later version of [ProductName] is already installed." />
         <InstallExecuteSequence>
@@ -209,7 +232,9 @@
             <Custom Action="RunAgentExe" After="RegisterAgentExe">NOT (REMOVE="ALL")</Custom>
             <Custom Action="stopAgentExe" After="InstallInitialize">Installed</Custom>
             <Custom Action="UninstAgentExe" After="stopAgentExe">Installed OR <![CDATA[OLDFOUND<>""]]></Custom>
+            <Custom Action="UnoldZabbix" After="InstallInitialize"><![CDATA[OLDZABBIX<>""]]> AND NOT Installed</Custom>
             <!-- <Custom Action="SSleeping" After="UnoldZabbix"><![CDATA[OLDZABBIX<>""]]> AND NOT Installed</Custom> -->
+            <Custom Action="KillAgent" After="UnoldZabbix"><![CDATA[REINSTALL<>""]]> OR <![CDATA[OLDFOUND<>""]]></Custom>
             <Custom Action="DeleteAgentService" After="KillAgent"><![CDATA[REINSTALL<>""]]></Custom>
         </InstallExecuteSequence>
     </Product>
