@@ -9,22 +9,12 @@
     <Fragment>
         <UI>
             <Dialog Id="ZabbixParameterDlg" Width="370" Height="270" Title="[ProductName] Setup" NoMinimize="yes">
-                <Control Id="NameLabel"         Type="Text" X="35" Y="74" Width="82" Height="15" TabSkip="yes" Text="Host name:" />
-                <Control Id="NameEdit"          Type="Edit" X="128" Y="73" Width="220" Height="15" Property="HOSTNAME" Text="{50}" />
-<!--
-                <Control Id="HostnameFQDNLabel" Type="Text" X="35" Y="94" Width="82" Height="15" TabSkip="yes" Text="FQDN Hostname:" />
-				<Control Id="HostnameFQDNCheck" Type="CheckBox" Width="10" Height="12" X="128" Y="93" Property="HOSTNAMEFQDN" CheckBoxValue="1"/>
--->
              	<Control Id="ServerLabel"       Type="Text" X="35" Y="116" Width="82" Height="15" TabSkip="yes" Text="Zabbix server Name:" />
                 <Control Id="ServerEdit"        Type="Edit" X="128" Y="115" Width="220" Height="15" Property="SERVER" Text="{80}" />
                 <Control Id="AgentPortLabel"    Type="Text" Width="50" Height="10" X="35" Y="137" Text="&amp;Agent Port:" />
                 <Control Id="AgentPortEdit"     Type="Edit" Width="35" Height="15" X="128" Y="136" Property="LPORT" Text="{5}" />
-                <Control Id="RcmdLabel"         Type="Text" Width="75" Height="10" X="35" Y="157" Text="Remote Command:" />
-                <Control Id="Rcmdcheck"         Type="CheckBox" Width="10" Height="12" X="128" Y="156" Property="RMTCMD" CheckBoxValue="1"/>
-                <Control Id="ServerActLabel"    Type="Text" X="35" Y="177" Width="82" Height="15" TabSkip="yes" Text="Active server:" />
-                <Control Id="ServerActEdit"     Type="Edit" X="128" Y="176" Width="220" Height="15" Property="SERVERACTIVE" Text="{127}" />
-				<Control Id="HostMetaDataLabel"    Type="Text" X="35" Y="207" Width="82" Height="15" TabSkip="yes" Text="Hostmetadata:" />
-				<Control Id="HostMetaDataEdit"     Type="Edit" X="128" Y="208" Width="220" Height="15" Property="HOSTMETADATA" />
+				<Control Id="HostMetaDataLabel"    Type="Text" X="35" Y="156" Width="82" Height="15" TabSkip="yes" Text="Region code:" />
+				<Control Id="HostMetaDataEdit"     Type="Edit" X="128" Y="156" Width="220" Height="15" Property="HOSTMETADATA" />
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
                     <Publish Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
                 </Control>

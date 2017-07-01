@@ -6,11 +6,9 @@
   Object: main wix installer script for zabbix agent on windows 32b and 64b
   
   public properties :
-  HOSTNAME (Default = WindowsName )
   ZABBIXSERVER
   LPORT   (Default = 10050)
-  RCMD
-  SERVERACTIVE (Default = 127.0.0.1 ) 
+  HOSTMETADATA
          
 -->
 <?define Property_ProductVersion= $(var.VersionProduct) ?>
@@ -41,15 +39,8 @@
             <RegistrySearch Id="ZabbixAgentRegistry" Type="directory" Root="HKLM" Key="Software\Zabbix Agent" Name="InstallDir" Win64="no" />
             <?endif ?>
         </Property>
-        <Property Id="HOSTNAME">
-            <?if $(var.ProcessorArchitecture)=x64 ?>
-            <RegistrySearch Id="HOSTNAMEReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="Hostname" Win64="yes" />
-            <?else ?>
-            <RegistrySearch Id="HOSTNAMEReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="Hostname" Win64="no" />
-            <?endif ?>
-        </Property>
-		<Property Id="HOSTNAMEFQDN" Secure="yes"></Property>
-        <Property Id="SERVER">
+        
+		<Property Id="SERVER">
             <?if $(var.ProcessorArchitecture)=x64 ?>
             <RegistrySearch Id="ZABBIXSERVERReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="ZabbixServer" Win64="yes" />
             <?else ?>
@@ -63,22 +54,8 @@
             <RegistrySearch Id="LISTENPORTReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="ListenPort" Win64="no" />
             <?endif ?>
         </Property>
-        <Property Id="RMTCMD" Value="1">
-            <?if $(var.ProcessorArchitecture)=x64 ?>
-            <RegistrySearch Id="RCMDReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="RemoteCommand" Win64="yes" />
-            <?else ?>
-            <RegistrySearch Id="RCMDReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="RemoteCommand" Win64="no" />
-            <?endif ?>
-        </Property>
-        <Property Id="SERVERACTIVE" Value="127.0.0.1">
-            <?if $(var.ProcessorArchitecture)=x64 ?>
-            <RegistrySearch Id="SERVERACTIVEReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="ServerActive" Win64="yes" />
-            <?else ?>
-            <RegistrySearch Id="SERVERACTIVEReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="ServerActive" Win64="no" />
-            <?endif ?>
-        </Property>
-		
-        <Property Id="HOSTMETADATA" Value="127.0.0.1">
+        
+        <Property Id="HOSTMETADATA">
             <?if $(var.ProcessorArchitecture)=x64 ?>
             <RegistrySearch Id="HOSTMETADATAReg" Type="raw" Root="HKLM" Key="Software\Zabbix Agent" Name="HostMetaData" Win64="yes" />
             <?else ?>
@@ -86,25 +63,8 @@
             <?endif ?>
         </Property>
 		
-        <Property Id="OLDZABBIX">
-            <?if $(var.ProcessorArchitecture)=x64 ?>
-            <RegistrySearch Id="OldZabbixReg" Type="raw" Root="HKLM" Key="SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Zabbix Agent" Name="UninstallString" />
-            <?else ?>
-            <RegistrySearch Id="OldZabbixReg" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Zabbix Agent" Name="UninstallString" />
-            <?endif ?>
-        </Property>
-        <Property Id="OLDZABBIXPATH">
-            <?if $(var.ProcessorArchitecture)=x64 ?>
-            <RegistrySearch Id="OldZabbixAgentReg" Type="directory" Root="HKLM" Key="SOFTWARE\Wow6432Node\Zabbix Agent" Name="Install_Dir" Win64="yes" />
-            <?else ?>
-            <RegistrySearch Id="OldZabbixAgentReg" Type="directory" Root="HKLM" Key="Software\Zabbix Agent" Name="Install_Dir" Win64="no" />
-            <?endif ?>
-        </Property >
 		
-		
-		<SetProperty Before='AppSearch' Sequence='both' Id='HOSTNAMEFQDN' Value='{}'><![CDATA[HOSTNAMEFQDN="0"]]></SetProperty>
-        <SetProperty Before='AppSearch' Sequence='both' Id='RMTCMD' Value='{}'><![CDATA[RMTCMD="0"]]></SetProperty>
-        <SetProperty Before='AppSearch' Sequence='both' Id='HOSTNAME' Value='[ComputerName]'>NOT HOSTNAME</SetProperty>
+	
        
         <?if $(var.ProcessorArchitecture)=x86 ?>
         <Condition Message="You are attempting to run the 32-bit installer on a 64-bit version of Windows."><![CDATA[ NOT Msix64]]></Condition>
@@ -126,7 +86,7 @@
                 </Directory>
             </Directory>
             <?endif ?>
-            <Directory Id="OLDZABBIXPATH" />
+            
         </Directory>
         <DirectoryRef Id="INSTALLDIR">
             <?if $(var.ProcessorArchitecture)=x64 ?>
@@ -135,12 +95,8 @@
                 <File Id="zabbix_agentdEXE" Name="zabbix_agentd.exe" DiskId="1" Source="files\win64\zabbix_agentd.exe" KeyPath="yes" />
                 <RegistryKey Root="HKLM" Key="Software\zabbix Agent" >
                     <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
-                    <RegistryValue Type="string" Name="HostName" Value="[HOSTNAME]" />
-					<RegistryValue Type="string" Name="HostNameFQDN" Value="[HOSTNAMEFQDN]" />
-                    <RegistryValue Type="string" Name="ZabbixServer" Value="[SERVER]" />
+        			<RegistryValue Type="string" Name="ZabbixServer" Value="[SERVER]" />
                     <RegistryValue Type="string" Name="ListenPort" Value="[LPORT]" />
-                    <RegistryValue Type="string" Name="RemoteCommand" Value="[RMTCMD]" />
-                    <RegistryValue Type="string" Name="ServerAvctive" Value="[SERVERACTIVE]" />
                     <RegistryValue Type="string" Name="HostMetaData" Value="[HOSTMETADATA]" />
                 </RegistryKey>
             </Component>
@@ -158,13 +114,9 @@
 			<Fire:FirewallException Id="Zabbix_Agent" Name="Zabbix Agent" Protocol="tcp" Port="[LPORT]" Scope="any" IgnoreFailure="yes" Profile="all" />
                 <File Id="zabbix_agentdEXE" Name="zabbix_agentd.exe" DiskId="1" Source="files\win32\zabbix_agentd.exe" KeyPath="yes" />
                 <RegistryKey Root="HKLM" Key="Software\zabbix Agent" >
-                    <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
-                    <RegistryValue Type="string" Name="HostName" Value="[HOSTNAME]" />
-					<RegistryValue Type="string" Name="HostNameFQDN" Value="[HOSTNAMEFQDN]" />
-                    <RegistryValue Type="string" Name="ZabbixServer" Value="[SERVER]" />
+                     <RegistryValue Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
+        			<RegistryValue Type="string" Name="ZabbixServer" Value="[SERVER]" />
                     <RegistryValue Type="string" Name="ListenPort" Value="[LPORT]" />
-                    <RegistryValue Type="string" Name="RemoteCommand" Value="[RMTCMD]" />
-                    <RegistryValue Type="string" Name="ServerAvctive" Value="[SERVERACTIVE]" />
                     <RegistryValue Type="string" Name="HostMetaData" Value="[HOSTMETADATA]" />
                 </RegistryKey>
             </Component>
@@ -223,12 +175,8 @@
 		
         <SystemTools:TemplateFile Id="zabbix_agentdconf_comp" Source="[#zabbix_agentdconf]" Target="[INSTALLDIR]zabbix_agentd.conf" ExecuteOnInstall="yes" ExecuteOnReInstall="yes">
 			<SystemTools:TemplateFileProperty Id="LOGFILEE_property" Name="LOGFILE" Value="[LOGFILE]" />
-            <SystemTools:TemplateFileProperty Id="HOSTNAME_property" Name="HOSTNAME" Value="[HOSTNAME]" />
-            <SystemTools:TemplateFileProperty Id="SERVER_property" Name="SERVER" Value="[SERVER]" />
             <SystemTools:TemplateFileProperty Id="LPORT_property" Name="LPORT" Value="[LPORT]" />
-            <SystemTools:TemplateFileProperty Id="RMTCMD_property" Name="RMTCMD" Value="[RMTCMD]" />
-			<SystemTools:TemplateFileProperty Id="SERVERACTIVE_property" Name="SERVERACTIVE" Value="[SERVERACTIVE]" />
-			<SystemTools:TemplateFileProperty Id="HOSTMETADATA_property" Name="HOSTMETADATA" Value="[HOSTMETADATA]" />
+        	<SystemTools:TemplateFileProperty Id="HOSTMETADATA_property" Name="HOSTMETADATA" Value="[HOSTMETADATA]" />
         </SystemTools:TemplateFile>
 		<?if $(var.ProcessorArchitecture)=x64 ?>
           <CustomAction Id="SChangeConfig" VBScriptCall="ChangeConfig" BinaryKey="Script_vbs" Win64="yes" />
