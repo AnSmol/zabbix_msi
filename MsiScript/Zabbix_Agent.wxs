@@ -196,7 +196,7 @@
         <CustomAction Id="KillAgent" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLDIR" ExeCommand="Taskkill /F /IM zabbix_agentd.exe" />
         <CustomAction Id="DeleteAgentService" Execute="deferred" Impersonate="no" Return="ignore" Directory="INSTALLDIR" ExeCommand="SC Delete &quot;zabbix agent&quot;" />
         <!-- <CustomAction Id="DeletConfig" Return="ignore" Directory="INSTALLDIR" ExeCommand="Delete [INSTALLDIR]zabbixagentd.conf&quot;" /> -->
-        <CustomAction Id="UnoldZabbix" Execute="deferred" Impersonate="no" Directory="OLDZABBIXPATH" ExeCommand="[OLDZABBIX] /S" />
+   
         <CustomAction Id="AlreadyUpdated" Error="[ProductName] has already been updated to 1.0.1 or newer." />
         <CustomAction Id="NoDowngrade" Error="A later version of [ProductName] is already installed." />
         <InstallExecuteSequence>
@@ -209,9 +209,7 @@
             <Custom Action="RunAgentExe" After="RegisterAgentExe">NOT (REMOVE="ALL")</Custom>
             <Custom Action="stopAgentExe" After="InstallInitialize">Installed</Custom>
             <Custom Action="UninstAgentExe" After="stopAgentExe">Installed OR <![CDATA[OLDFOUND<>""]]></Custom>
-            <Custom Action="UnoldZabbix" After="InstallInitialize"><![CDATA[OLDZABBIX<>""]]> AND NOT Installed</Custom>
             <!-- <Custom Action="SSleeping" After="UnoldZabbix"><![CDATA[OLDZABBIX<>""]]> AND NOT Installed</Custom> -->
-            <Custom Action="KillAgent" After="UnoldZabbix"><![CDATA[REINSTALL<>""]]> OR <![CDATA[OLDFOUND<>""]]></Custom>
             <Custom Action="DeleteAgentService" After="KillAgent"><![CDATA[REINSTALL<>""]]></Custom>
         </InstallExecuteSequence>
     </Product>
